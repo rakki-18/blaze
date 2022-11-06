@@ -2,12 +2,21 @@ from web3 import Web3
 import csv
 import os
 
+# Chinese usernames are not supported
+def isValidUserNameCharacter(character):
+    if character.isalpha() == True:
+        return True
+    if character == '.':
+        return True
+    if character == '-':
+        return True
+    return False
 # Helper function to retrieve eth name from a string
 # Is called only when str contains '.eth'
 def get_eth_name(str):
     cur_word = ""
     for element in str:
-        if element == ' ':
+        if not isValidUserNameCharacter(element):
             cur_word = ""
         else:
             cur_word = cur_word + element
@@ -17,9 +26,14 @@ def get_eth_name(str):
 # Input: valid eth_name
 # Output: wallet address of user 'eth_name'
 def get_wallet_address_from_eth_name(eth_name):
-    w3 = Web3(Web3.HTTPProvider(os.environ.get('infura_node')))
-    eth_address = w3.ens.address(name=eth_name)
-    return eth_address
+    try:
+        w3 = Web3(Web3.HTTPProvider(os.environ.get('infura_node')))
+        eth_address = w3.ens.address(name=eth_name)
+        print(eth_address)
+        return eth_address
+    except:
+        return 'None'
+
 
 def get_wallet_address_from_user(user_details):
     name = user_details[1]
